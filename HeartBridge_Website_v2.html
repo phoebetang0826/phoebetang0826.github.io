@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeartBridge — Anticipate & Respond</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<style>
+
+/* ─── TOKENS ─────────────────────────────────── */
+:root {
+  --ink:    #0C1D40;
+  --ink2:   #1A3060;
+  --blue:   #6B9FD4;
+  --blue2:  #5A8EC5;
+  --blue3:  #4A7EB5;
+  --teal:   #2BB8B8;
+  --teal2:  #40CECE;
+  --amber:  #F5A623;
+  --coral:  #E8526E;
+  --soft:   #F3F7FD;
+  --soft2:  #F8FAFF;
+  --text:   #2C3E5C;
+  --muted:  #8A97B0;
+  --bdr:    rgba(107,159,212,.13);
+  --white:  #FFFFFF;
+  --sh:     0 4px 24px rgba(12,29,64,.07);
+  --sh-lg:  0 20px 64px rgba(12,29,64,.14);
+  --max:    1100px;
+  --nav-h:  96px;     /* ← nav height */
+  --sec-v:  90px;     /* ← section vertical padding */
+}
+
+/* ─── RESET ──────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);overflow-x:hidden;}
+img{max-width:100%;display:block;}
+
+/* ─── NAV ────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;padding:0 6%;
+  transition:background .35s,box-shadow .35s;
+}
+nav.scrolled{background:rgba(255,255,255,.96);backdrop-filter:blur(20px);box-shadow:0 1px 0 var(--bdr);}
+.logo{display:flex;align-items:center;text-decoration:none;}
+.nav-links{display:flex;gap:32px;list-style:none;}
+.nav-links a{font-size:.86rem;font-weight:500;color:rgba(255,255,255,.65);text-decoration:none;transition:color .2s;}
+nav.scrolled .nav-links a{color:var(--text);}
+.nav-links a:hover,.nav-links a:focus{color:var(--blue2);outline:none;}
+.nav-right{display:flex;gap:10px;align-items:center;}
+
+/* ─── BUTTONS ────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 24px;border-radius:100px;font-family:'Sora',sans-serif;
+  font-size:.85rem;font-weight:600;cursor:pointer;transition:all .22s;
+  text-decoration:none;border:none;white-space:nowrap;
+}
+.btn:focus-visible{outline:2px solid var(--blue2);outline-offset:3px;}
+.btn-blue{background:var(--blue2);color:#fff;box-shadow:0 4px 18px rgba(90,142,197,.3);}
+.btn-blue:hover{background:var(--blue3);transform:translateY(-1px);box-shadow:0 7px 26px rgba(90,142,197,.4);}
+.btn-ghost-white{background:transparent;color:rgba(255,255,255,.82);border:1.5px solid rgba(255,255,255,.28);}
+.btn-ghost-white:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.58);}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--bdr);}
+.btn-ghost:hover{border-color:var(--blue2);background:var(--soft);}
+.btn-teal{background:var(--teal);color:#fff;box-shadow:0 4px 14px rgba(43,184,184,.28);}
+.btn-teal:hover{background:var(--teal2);transform:translateY(-1px);}
+.btn-navy{background:var(--ink);color:#fff;}
+.btn-navy:hover{opacity:.87;transform:translateY(-1px);}
+.btn-white{background:#fff;color:var(--blue2);box-shadow:0 4px 20px rgba(12,29,64,.14);}
+.btn-white:hover{transform:translateY(-1px);box-shadow:0 8px 28px rgba(12,29,64,.2);}
+.btn-outline-white{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.34);}
+.btn-outline-white:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.62);}
+.btn-lg{padding:15px 34px;font-size:.95rem;}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.45;pointer-events:none;transform:none;}
+
+/* ─── ANNOUNCE ───────────────────────────────── */
+.announce{
+  margin-top:var(--nav-h);background:var(--ink);color:rgba(255,255,255,.62);
+  text-align:center;padding:9px 20px;font-size:.79rem;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.ann-pill{background:var(--amber);color:var(--ink);font-family:'Sora',sans-serif;font-weight:800;font-size:.67rem;padding:2px 11px;border-radius:100px;}
+
+/* ─── SECTION SHELL ──────────────────────────── */
+.sec{padding:var(--sec-v) 6%;}
+.sec-inner{max-width:var(--max);margin:0 auto;}
+.sec-lbl{
+  font-family:'Sora',sans-serif;font-size:.66rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:2.5px;color:var(--blue2);
+  display:flex;align-items:center;gap:8px;margin-bottom:16px;
+}
+.sec-lbl::before{content:'';width:18px;height:1.5px;background:currentColor;flex-shrink:0;}
+.sec-lbl.lt{color:rgba(107,159,212,.6);}
+h2{font-family:'DM Serif Display',serif;font-size:clamp(2rem,3.4vw,3rem);color:var(--ink);line-height:1.13;margin-bottom:14px;}
+h2 em{font-style:italic;color:var(--blue2);}
+h2.wh{color:#fff;}
+h2.wh em{color:var(--teal2);}
+h3{font-family:'DM Serif Display',serif;font-size:1.55rem;color:var(--ink);line-height:1.24;margin-bottom:10px;word-break:break-word;overflow-wrap:break-word;}
+h3 em{font-style:italic;color:var(--blue2);}
+.sub{font-size:1rem;color:var(--muted);line-height:1.72;max-width:520px;}
+.sub.wh{color:rgba(255,255,255,.5);}
+.sec-head{margin-bottom:48px;}
+.sec-head.center{text-align:center;}
+.sec-head.center .sec-lbl{justify-content:center;}
+.sec-head.center .sub{margin:0 auto;}
+
+/* ─── HERO ───────────────────────────────────── */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  background:linear-gradient(158deg,#0C1D40 0%,#142B58 55%,#0E2248 100%);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;top:-15%;right:-8%;width:560px;height:560px;
+  background:radial-gradient(circle,rgba(107,159,212,.09) 0%,transparent 65%);
+  border-radius:50%;pointer-events:none;
+}
+.hero::after{
+  content:'';position:absolute;bottom:-20%;left:-5%;width:480px;height:480px;
+  background:radial-gradient(circle,rgba(43,184,184,.06) 0%,transparent 65%);
+  border-radius:50%;pointer-events:none;
+}
+.hero-inner{
+  max-width:var(--max);margin:0 auto;
+  /* reduced top from 130px → 72px so content sits higher above the fold */
+  padding:72px 6% 60px;
+  display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;
+  width:100%;position:relative;z-index:1;
+}
+/* Hero copy */
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(107,159,212,.12);border:1px solid rgba(107,159,212,.24);
+  color:rgba(255,255,255,.76);font-family:'Sora',sans-serif;font-size:.69rem;font-weight:600;
+  padding:5px 14px;border-radius:100px;margin-bottom:24px;
+}
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.5)}}
+.hero h1{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(2.9rem,5.5vw,4.8rem);
+  line-height:1.06;color:#fff;margin-bottom:18px;
+}
+.hero h1 em{font-style:italic;color:var(--blue);}
+.hero-sub{font-size:1.02rem;color:rgba(255,255,255,.52);line-height:1.75;margin-bottom:32px;max-width:440px;}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:40px;}
+/* Trust line */
+.trust-line{
+  display:flex;align-items:center;gap:0;
+  border-top:1px solid rgba(255,255,255,.08);padding-top:24px;
+}
+.tl-item{padding-right:20px;border-right:1px solid rgba(255,255,255,.07);flex:1;}
+.tl-item:last-child{border-right:none;padding-right:0;}
+.tl-num{font-family:'Sora',sans-serif;font-size:1.35rem;font-weight:800;color:#fff;line-height:1;margin-bottom:3px;}
+.tl-num em{color:var(--teal);font-style:normal;}
+.tl-desc{font-size:.66rem;color:rgba(255,255,255,.32);line-height:1.35;}
+
+/* Hero phone */
+.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;min-height:520px;}
+.phone{
+  width:248px;border-radius:42px;overflow:hidden;
+  box-shadow:0 48px 100px rgba(0,0,0,.52);
+  border:2.5px solid rgba(255,255,255,.09);
+  background:var(--ink);position:relative;z-index:2;
+}
+.ps{padding:22px 15px 64px;background:linear-gradient(180deg,#0C1D40 0%,#162C5C 100%);color:#fff;min-height:490px;}
+.ps-hd{display:flex;justify-content:space-between;margin-bottom:14px;}
+.ps-hd span{font-size:.6rem;color:rgba(255,255,255,.38);}
+.ps-name{font-family:'DM Serif Display',serif;font-size:.95rem;color:rgba(255,255,255,.9);margin-bottom:2px;}
+.ps-sub{font-size:.57rem;color:rgba(255,255,255,.34);margin-bottom:13px;}
+.m-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.m{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:9px 4px;text-align:center;}
+.mv{font-family:'Sora',sans-serif;font-size:1.15rem;font-weight:800;display:block;line-height:1;}
+.ml{font-size:.44rem;color:rgba(255,255,255,.33);text-transform:uppercase;margin-top:2px;}
+.md{font-size:.5rem;margin-top:2px;}
+.dg{color:#4CD964;}.da{color:#F5A623;}
+.i-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:10px;margin-bottom:9px;}
+.i-t{font-size:.51rem;color:var(--teal2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:3px;}
+.i-tx{font-size:.63rem;color:rgba(255,255,255,.74);line-height:1.5;margin-bottom:4px;}
+.i-row{font-size:.55rem;color:rgba(255,255,255,.4);display:flex;gap:5px;padding:2px 0;border-top:1px solid rgba(255,255,255,.05);}
+.i-row:first-of-type{border:none;padding-top:0;}
+.i-n{color:var(--blue);font-weight:700;flex-shrink:0;}
+.cl-mini{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px;display:flex;gap:8px;align-items:center;}
+.cl-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue2),var(--teal));display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.cl-n{font-family:'Sora',sans-serif;font-weight:700;font-size:.68rem;color:#fff;}
+.cl-c{font-size:.53rem;color:var(--teal2);font-weight:600;margin-top:1px;}
+.cl-s{font-size:.51rem;color:rgba(255,255,255,.3);margin-top:2px;}
+.cl-btn{margin-left:auto;background:var(--blue2);color:#fff;border:none;border-radius:100px;padding:3px 9px;font-size:.56rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;}
+.pnav{position:absolute;bottom:0;left:0;right:0;background:rgba(6,14,32,.94);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-around;padding:7px 0 13px;}
+.pni{font-size:12px;opacity:.3;}.pni.on{opacity:1;}
+.fn{position:absolute;background:var(--white);border-radius:12px;padding:10px 13px;box-shadow:var(--sh-lg);z-index:3;}
+.fn1{right:-14px;top:28px;width:180px;border-left:3px solid var(--teal);animation:floatN 4.6s ease-in-out infinite;}
+.fn2{right:-6px;bottom:70px;width:174px;border-left:3px solid var(--coral);animation:floatN 4.6s ease-in-out infinite;animation-delay:1.3s;}
+@keyframes floatN{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.fn-ic{font-size:.85rem;margin-bottom:2px;}
+.fn-ti{font-family:'Sora',sans-serif;font-size:.62rem;font-weight:700;color:var(--ink);margin-bottom:1px;}
+.fn-tx{font-size:.56rem;color:var(--muted);line-height:1.35;}
+
+/* ─── WHY — Oura portrait tile style ────────── */
+.why{background:var(--white);}
+.btile-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+/* Each tile: tall portrait card with gradient bg + text overlay */
+.btile{
+  position:relative;border-radius:22px;overflow:hidden;
+  /* portrait aspect ratio ≈ 2:3 */
+  aspect-ratio:2/3;
+  min-height:440px;
+  cursor:default;
+  transition:transform .34s,box-shadow .34s;
+}
+.btile:hover{transform:translateY(-5px);box-shadow:0 28px 72px rgba(12,29,64,.22);}
+/* Photo backgrounds — object-fit cover fills tile */
+.btile-bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  transition:transform .5s ease;
+}
+.btile:hover .btile-bg{transform:scale(1.04);}
+/* Dark scrim on top of photo for widget/text legibility */
+.btile-dim{
+  position:absolute;inset:0;z-index:1;
+  background:rgba(8,18,40,.44);
+}
+/* Central data widget */
+.btile-widget{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);
+  display:flex;flex-direction:column;align-items:center;gap:10px;z-index:2;
+}
+/* Circular readiness ring (tile 1) */
+.bw-ring{
+  width:96px;height:96px;border-radius:50%;
+  border:3px solid rgba(43,184,184,.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);backdrop-filter:blur(6px);
+  position:relative;
+}
+.bw-ring::before{
+  content:'';position:absolute;inset:-3px;border-radius:50%;
+  background:conic-gradient(var(--teal) 0deg 317deg,rgba(255,255,255,.1) 317deg 360deg);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));
+          mask:radial-gradient(farthest-side,transparent calc(100% - 3px),#fff calc(100% - 3px));
+}
+.bw-ring-v{font-family:'Sora',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;line-height:1;}
+.bw-ring-l{font-size:.44rem;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;margin-top:1px;}
+/* Availability badge (tile 2) */
+.bw-avail{
+  background:rgba(255,255,255,.08);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  padding:16px 20px;text-align:center;min-width:150px;
+}
+.bw-avail-dot{width:8px;height:8px;border-radius:50%;background:#4CD964;display:inline-block;margin-right:5px;box-shadow:0 0 0 3px rgba(76,217,100,.2);}
+.bw-avail-s{font-family:'Sora',sans-serif;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.85);}
+.bw-avail-t{font-size:.54rem;color:rgba(255,255,255,.4);margin-top:6px;}
+.bw-avail-n{font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff;margin-top:4px;}
+.bw-avail-c{font-size:.52rem;color:var(--teal2);font-weight:600;}
+/* Cost badge (tile 3) */
+.bw-cost{
+  background:rgba(255,255,255,.08);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,255,255,.14);border-radius:14px;
+  padding:16px 20px;text-align:center;min-width:150px;
+}
+.bw-cost-vs{display:flex;flex-direction:column;gap:4px;}
+.bw-cost-hi{font-size:.55rem;color:rgba(255,255,255,.3);text-decoration:line-through;}
+.bw-cost-lo-wrap{display:flex;align-items:baseline;gap:3px;justify-content:center;}
+.bw-cost-lo{font-family:'DM Serif Display',serif;font-size:1.8rem;color:#fff;}
+.bw-cost-lo sub{font-family:'DM Sans',sans-serif;font-size:.65rem;color:rgba(255,255,255,.5);}
+.bw-cost-tag{font-size:.52rem;color:var(--teal2);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+/* Text overlay at bottom */
+.btile-overlay{
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
+  background:linear-gradient(to top,rgba(10,18,40,.96) 0%,rgba(10,18,40,.78) 55%,transparent 100%);
+  padding:32px 24px 28px;
+}
+.btile-num{
+  font-family:'Sora',sans-serif;font-size:.6rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;color:rgba(107,159,212,.75);margin-bottom:8px;
+}
+.btile h3{
+  font-size:1.25rem;color:#fff;line-height:1.26;
+  margin-bottom:7px;word-break:normal;overflow-wrap:normal;
+}
+.btile h3 em{color:var(--teal2);}
+.btile-p{font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6;}
+
+/* ─── HOW — interactive tabbed stepper ──────── */
+.how{background:var(--soft2);}
+.stepper{
+  position:relative;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;margin-bottom:44px;
+}
+.stepper::before{
+  content:'';position:absolute;top:27px;left:12.5%;right:12.5%;
+  height:1px;background:linear-gradient(90deg,var(--blue2),var(--teal));opacity:.2;
+}
+.step{
+  text-align:center;padding:0 8px;cursor:pointer;transition:opacity .2s;
+}
+.step-circle{
+  width:54px;height:54px;border-radius:50%;
+  background:var(--white);border:1.5px solid var(--bdr);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 12px;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;
+  color:var(--muted);box-shadow:var(--sh);transition:all .28s;position:relative;z-index:1;
+}
+.step.active .step-circle{background:var(--blue2);color:#fff;border-color:var(--blue2);box-shadow:0 6px 24px rgba(90,142,197,.38);}
+.step-lbl{font-family:'Sora',sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:4px;transition:color .28s;}
+.step.active .step-lbl{color:var(--blue2);}
+.step-title{
+  font-family:'DM Serif Display',serif;font-size:.95rem;color:var(--ink);
+  transition:color .28s;
+  /* fix text overflow: prevent long strings from causing layout shift */
+  word-break:break-word;overflow-wrap:break-word;
+  hyphens:auto;
+  padding:0 4px;
+}
+.step:not(.active){opacity:.5;}
+.step:not(.active):hover{opacity:.75;}
+
+/* Step panels */
+.step-panels{position:relative;min-height:280px;}
+.step-panel{
+  display:none;
+  grid-template-columns:1fr 1fr;gap:52px;align-items:center;
+  opacity:0;transform:translateY(10px);transition:opacity .35s,transform .35s;
+}
+.step-panel.active{display:grid;opacity:1;transform:translateY(0);}
+/* Fix overflow: both columns must respect their grid lane */
+.sp-copy,.sp-visual{min-width:0;overflow:hidden;}
+.sp-copy .sp-step{
+  font-family:'Sora',sans-serif;font-size:.6rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;color:var(--blue2);margin-bottom:10px;
+}
+.sp-copy h3{
+  margin-bottom:12px;
+  font-size:1.45rem;
+  /* prevent collision with punctuation or long tokens */
+  overflow-wrap:break-word;word-break:break-word;hyphens:auto;
+  line-height:1.28;
+}
+.sp-copy p{
+  font-size:.91rem;color:var(--muted);line-height:1.74;
+  max-width:400px;overflow-wrap:break-word;word-break:break-word;
+}
+/* Dark data panel */
+.sp-visual{
+  background:var(--ink);border-radius:20px;padding:24px;
+  box-shadow:var(--sh-lg);min-height:240px;
+  display:flex;flex-direction:column;justify-content:center;
+  position:relative;overflow:hidden;
+}
+.sp-visual::after{
+  content:'';position:absolute;bottom:-40px;right:-40px;
+  width:150px;height:150px;
+  background:radial-gradient(circle,rgba(107,159,212,.1) 0%,transparent 70%);
+  border-radius:50%;
+}
+.dv-lbl{font-size:.51rem;color:rgba(255,255,255,.26);text-transform:uppercase;letter-spacing:1px;margin-bottom:11px;}
+.dv-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:9px;}
+.dvc{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:10px 4px;text-align:center;}
+.dvc-v{font-family:'Sora',sans-serif;font-size:1.25rem;font-weight:800;color:#fff;display:block;}
+.dvc-l{font-size:.44rem;color:rgba(255,255,255,.32);text-transform:uppercase;margin-top:2px;}
+.dv-box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.06);border-radius:9px;padding:11px;}
+.dv-box-t{font-size:.51rem;color:var(--teal2);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:4px;}
+.dv-box-tx{font-size:.71rem;color:rgba(255,255,255,.74);line-height:1.52;overflow-wrap:break-word;}
+.dv-row2{display:flex;flex-direction:column;gap:6px;}
+.dv-pill{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px;display:flex;gap:8px;align-items:center;}
+.dv-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--blue2),var(--teal));display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0;}
+.dv-pn{font-family:'Sora',sans-serif;font-weight:700;font-size:.69rem;color:#fff;}
+.dv-pc{font-size:.54rem;color:var(--teal2);font-weight:600;margin-top:1px;}
+.dv-ps{font-size:.5rem;color:rgba(255,255,255,.3);}
+.dv-pbtn{margin-left:auto;background:var(--blue2);color:#fff;border:none;border-radius:100px;padding:4px 9px;font-size:.56rem;font-weight:700;cursor:pointer;font-family:'Sora',sans-serif;flex-shrink:0;}
+
+/* ─── WEARABLE ───────────────────────────────── */
+.wearable{background:var(--white);}
+.wgrid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.wdev{
+  background:linear-gradient(158deg,var(--ink) 0%,var(--ink2) 100%);
+  border-radius:24px;padding:44px 36px;text-align:center;
+  box-shadow:var(--sh-lg);position:relative;overflow:hidden;
+}
+.wdev::before{
+  content:'';position:absolute;top:-50px;left:-50px;width:200px;height:200px;
+  background:radial-gradient(circle,rgba(107,159,212,.18) 0%,transparent 70%);border-radius:50%;
+}
+.wdev-em{font-size:3.6rem;display:block;margin-bottom:8px;}
+.wdev-n{font-family:'Sora',sans-serif;font-size:.96rem;font-weight:800;color:#fff;margin-bottom:3px;}
+.wdev-s{font-size:.7rem;color:rgba(255,255,255,.35);}
+.wdev-specs{margin-top:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.ws{background:rgba(255,255,255,.06);border-radius:8px;padding:9px 5px;text-align:center;}
+.ws-i{font-size:.95rem;margin-bottom:2px;}
+.ws-t{font-size:.5rem;color:rgba(255,255,255,.42);line-height:1.3;}
+.winfo h3{font-size:1.82rem;margin-bottom:10px;}
+.winfo p{color:var(--muted);font-size:.91rem;line-height:1.72;margin-bottom:22px;max-width:430px;}
+.wfeats{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:26px;}
+.wf{display:flex;gap:10px;align-items:flex-start;}
+.wf-ck{width:19px;height:19px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:.52rem;color:#fff;flex-shrink:0;margin-top:2px;}
+.wf-t{font-size:.86rem;color:var(--text);}
+.wf-t strong{color:var(--ink);}
+.pricebox{background:var(--soft);border-radius:14px;padding:18px 20px;border:1.5px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;}
+.pricebox-amt{font-family:'DM Serif Display',serif;font-size:2rem;color:var(--ink);}
+.pricebox-amt sub{font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--muted);}
+.pricebox-desc{font-size:.7rem;color:var(--muted);margin-top:2px;}
+
+/* ─── PRICING ────────────────────────────────── */
+.pricing{background:var(--soft2);}
+.sbar{
+  display:inline-flex;align-items:center;gap:12px;
+  background:rgba(43,184,184,.1);border:1px solid rgba(43,184,184,.2);
+  border-radius:100px;padding:6px 18px;margin-bottom:16px;
+}
+.sbar span{font-size:.74rem;font-family:'Sora',sans-serif;}
+.sbar-x{text-decoration:line-through;color:var(--muted);}
+.sbar-n{color:var(--teal);font-weight:700;}
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:900px;margin:0 auto;}
+.plan{background:var(--white);border-radius:20px;padding:30px 22px;border:1.5px solid var(--bdr);transition:transform .3s,box-shadow .3s;position:relative;}
+.plan:hover{transform:translateY(-4px);box-shadow:var(--sh-lg);}
+.plan.feat{background:var(--ink);border-color:var(--ink);transform:scale(1.04);}
+.plan.feat:hover{transform:scale(1.04) translateY(-4px);}
+.pbadge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--coral);color:#fff;font-family:'Sora',sans-serif;font-size:.62rem;font-weight:700;padding:3px 14px;border-radius:100px;white-space:nowrap;}
+.pname{font-family:'Sora',sans-serif;font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;}
+.plan.feat .pname{color:rgba(255,255,255,.38);}
+.pprice{font-family:'DM Serif Display',serif;font-size:2.2rem;color:var(--ink);}
+.plan.feat .pprice{color:#fff;}
+.pprice sub{font-family:'DM Sans',sans-serif;font-size:.84rem;color:var(--muted);}
+.plan.feat .pprice sub{color:rgba(255,255,255,.34);}
+.pdesc{font-size:.74rem;color:var(--muted);margin:5px 0 16px;line-height:1.5;}
+.plan.feat .pdesc{color:rgba(255,255,255,.4);}
+.pfeats{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:22px;}
+.pf{display:flex;gap:8px;font-size:.81rem;color:var(--text);}
+.plan.feat .pf{color:rgba(255,255,255,.72);}
+.py{color:var(--teal);flex-shrink:0;}
+.plan.feat .py{color:var(--teal2);}
+.px{color:rgba(26,46,90,.16);flex-shrink:0;}
+
+/* ─── PROOF ──────────────────────────────────── */
+.proof{background:var(--ink);}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);margin-bottom:56px;}
+.si{padding:0 30px 0 0;border-right:1px solid rgba(255,255,255,.07);}
+.si:first-child{padding-left:0;}
+.si:last-child{border-right:none;padding-right:0;}
+.si-num{font-family:'DM Serif Display',serif;font-size:clamp(2.2rem,3.8vw,3.4rem);color:#fff;line-height:1;margin-bottom:6px;}
+.si-num em{font-style:italic;color:var(--teal);}
+.si-desc{font-size:.72rem;color:rgba(255,255,255,.3);line-height:1.45;}
+.logo-wall{margin-bottom:52px;overflow:hidden;}
+.lw-lbl{font-family:'Sora',sans-serif;font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,.2);margin-bottom:14px;}
+/* Marquee track — duplicated children for seamless loop */
+.lw-track{
+  display:flex;gap:9px;width:max-content;
+  animation:lw-scroll 28s linear infinite;
+}
+.logo-wall:hover .lw-track{animation-play-state:paused;}
+@keyframes lw-scroll{
+  from{transform:translateX(0);}
+  to{transform:translateX(-50%);}
+}
+@media(prefers-reduced-motion:reduce){
+  .lw-track{animation:none;flex-wrap:wrap;width:auto;}
+}
+.lp{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:8px 15px;font-family:'Sora',sans-serif;font-size:.69rem;font-weight:700;color:rgba(255,255,255,.46);white-space:nowrap;flex-shrink:0;}
+.ev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:52px;}
+.ev{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);border-radius:15px;padding:24px 20px;}
+.ev-stat{font-family:'DM Serif Display',serif;font-size:1.9rem;color:#fff;margin-bottom:5px;}
+.ev-stat em{font-style:italic;color:var(--teal);}
+.ev-desc{font-size:.78rem;color:rgba(255,255,255,.42);line-height:1.55;}
+
+/* ─── TESTIMONIALS — text-only, expanded ────── */
+.test-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.tq{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.07);
+  border-radius:18px;padding:32px 28px;
+  display:flex;flex-direction:column;
+}
+.tq-stars{color:var(--amber);font-size:.74rem;margin-bottom:14px;letter-spacing:2px;}
+.tq-text{
+  font-family:'DM Serif Display',serif;font-size:1.02rem;
+  line-height:1.68;color:rgba(255,255,255,.86);
+  margin-bottom:20px;flex:1;
+  /* subtle left quote decoration */
+  position:relative;
+}
+/* Decorative quotation mark */
+.tq-text::before{
+  content:'\201C';
+  font-family:'DM Serif Display',serif;
+  font-size:3.5rem;line-height:1;color:rgba(255,255,255,.07);
+  position:absolute;top:-18px;left:-10px;
+}
+/* Text-only author label — no avatar, no real name */
+.tq-cred{
+  font-family:'Sora',sans-serif;font-size:.68rem;font-weight:600;
+  color:rgba(255,255,255,.26);letter-spacing:.4px;
+  border-top:1px solid rgba(255,255,255,.07);
+  padding-top:14px;margin-top:auto;
+}
+/* Award + disclaimer */
+.award-row{display:flex;gap:10px;align-items:center;margin-bottom:52px;flex-wrap:wrap;}
+.award{display:inline-flex;align-items:center;gap:8px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.2);border-radius:9px;padding:8px 15px;}
+.award span{font-family:'Sora',sans-serif;font-size:.7rem;font-weight:700;color:var(--amber);}
+.disclaimer{margin-top:44px;padding:15px 18px;background:rgba(255,255,255,.03);border-radius:10px;border:1px solid rgba(255,255,255,.05);}
+.disclaimer p{font-size:.69rem;color:rgba(255,255,255,.24);line-height:1.7;}
+
+/* ─── B2B ────────────────────────────────────── */
+.b2b{background:linear-gradient(140deg,#0A1A38 0%,#16285A 100%);}
+.b2b-inner{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.b2b-list{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:12px;}
+.b2b-li{display:flex;gap:11px;font-size:.86rem;color:rgba(255,255,255,.62);line-height:1.6;}
+.b2b-ic{color:var(--teal2);flex-shrink:0;margin-top:2px;}
+.b2b-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:17px;padding:26px;}
+.b2b-card-t{font-family:'Sora',sans-serif;font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.32);margin-bottom:14px;}
+.b2b-plan{padding-bottom:13px;margin-bottom:13px;border-bottom:1px solid rgba(255,255,255,.07);}
+.b2b-plan:last-child{border:none;margin:0;padding:0;}
+.b2b-ph{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.b2b-pn{font-family:'Sora',sans-serif;font-weight:700;color:#fff;font-size:.84rem;}
+.b2b-pp{font-family:'Sora',sans-serif;font-weight:800;color:var(--teal2);font-size:.92rem;}
+.b2b-pd{font-size:.7rem;color:rgba(255,255,255,.34);}
+
+/* ─── FAQ ────────────────────────────────────── */
+.faq{background:var(--soft);}
+.faq-list{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:6px;}
+.faq-item{background:var(--white);border:1px solid var(--bdr);border-radius:13px;overflow:hidden;transition:border-color .22s,box-shadow .22s;}
+.faq-item.open{border-color:rgba(107,159,212,.32);box-shadow:0 4px 20px rgba(107,159,212,.1);}
+.faq-q{display:flex;justify-content:space-between;align-items:center;padding:18px 22px;cursor:pointer;gap:16px;background:transparent;width:100%;border:none;text-align:left;}
+.faq-q:focus-visible{outline:2px solid var(--blue2);outline-offset:-2px;}
+.faq-qt{font-family:'Sora',sans-serif;font-size:.89rem;font-weight:600;color:var(--ink);}
+.faq-ic{width:24px;height:24px;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;flex-shrink:0;transition:transform .28s,background .2s;color:var(--blue2);}
+.faq-item.open .faq-ic{transform:rotate(45deg);background:rgba(107,159,212,.14);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .38s ease;}
+.faq-a-in{padding:0 22px 18px;font-size:.86rem;color:var(--muted);line-height:1.74;max-width:600px;}
+.faq-item.open .faq-a{max-height:360px;}
+
+/* ─── FINAL CTA ──────────────────────────────── */
+.final-cta{
+  background:linear-gradient(140deg,var(--blue2) 0%,var(--ink) 100%);
+  text-align:center;padding:var(--sec-v) 6%;position:relative;overflow:hidden;
+}
+.final-cta::before{
+  content:'';position:absolute;top:-60%;left:50%;transform:translateX(-50%);
+  width:700px;height:700px;
+  background:radial-gradient(circle,rgba(255,255,255,.07) 0%,transparent 55%);
+  border-radius:50%;
+}
+.final-cta h2{font-size:clamp(2rem,4vw,3rem);color:#fff;margin-bottom:12px;position:relative;}
+.final-cta h2 em{font-style:italic;color:var(--teal2);}
+.final-cta p{color:rgba(255,255,255,.52);font-size:.94rem;margin-bottom:30px;position:relative;}
+.final-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;}
+
+/* ─── FOOTER ─────────────────────────────────── */
+footer{background:var(--ink);color:rgba(255,255,255,.34);padding:56px 6% 26px;}
+.ftgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px;}
+.ftbrand{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.ft-desc{font-size:.77rem;line-height:1.65;max-width:230px;}
+.ftinst{margin-top:14px;font-size:.66rem;}
+.ftinst-l{color:rgba(255,255,255,.18);margin-bottom:2px;}
+.ftinst-v{color:rgba(255,255,255,.36);}
+.ftcol-t{font-family:'Sora',sans-serif;font-weight:700;font-size:.7rem;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:13px;}
+.ftlinks{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.ftlinks a{color:rgba(255,255,255,.34);text-decoration:none;font-size:.77rem;transition:color .2s;}
+.ftlinks a:hover,.ftlinks a:focus{color:rgba(255,255,255,.74);}
+.ftbot{border-top:1px solid rgba(255,255,255,.07);padding-top:16px;display:flex;justify-content:space-between;align-items:center;font-size:.68rem;flex-wrap:wrap;gap:10px;}
+.ftleg{display:flex;gap:14px;}
+.ftleg a{color:rgba(255,255,255,.24);text-decoration:none;}
+.ftleg a:hover{color:rgba(255,255,255,.55);}
+
+/* ─── ANIMATIONS ─────────────────────────────── */
+.fu{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.fu.in{opacity:1;transform:translateY(0);}
+
+/* ─── RESPONSIVE ─────────────────────────────── */
+@media(max-width:960px){
+  :root{--sec-v:72px;--nav-h:72px;}
+  nav{height:72px;}
+  .announce{margin-top:72px;}
+  #nav-logo{height:58px !important;}
+  .hero-inner{grid-template-columns:1fr;padding:80px 6% 56px;}
+  .hero-visual{display:none;}
+  .trust-line{flex-wrap:wrap;gap:14px;}
+  .tl-item{flex:calc(50% - 8px);border-right:none;}
+  .btile-grid{grid-template-columns:1fr;}
+  .btile{aspect-ratio:3/2;min-height:320px;}
+  .btile-widget{top:40%;transform:translate(-50%,-50%);}
+  .stepper{grid-template-columns:1fr 1fr;}
+  .stepper::before{display:none;}
+  .step-panel.active{grid-template-columns:1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:28px;}
+  .si{border-right:none;padding-right:0;}
+  .ev-grid{grid-template-columns:1fr;}
+  .test-grid{grid-template-columns:1fr;}
+  .wgrid{grid-template-columns:1fr;}
+  .plan-grid{grid-template-columns:1fr;max-width:460px;}
+  .plan.feat{transform:scale(1);}
+  .plan.feat:hover{transform:translateY(-4px);}
+  .b2b-inner{grid-template-columns:1fr;}
+  .ftgrid{grid-template-columns:1fr 1fr;}
+  .nav-links{display:none;}
+}
+@media(max-width:600px){
+  :root{--sec-v:60px;--nav-h:60px;}
+  nav{height:60px;}
+  .announce{margin-top:60px;}
+  #nav-logo{height:44px !important;}
+  .hero-inner{padding:68px 5% 50px;}
+  .btile-grid{grid-template-columns:1fr;}
+  .btile{aspect-ratio:3/2;min-height:280px;}
+  .stepper{grid-template-columns:1fr 1fr;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:20px;}
+  .ftgrid{grid-template-columns:1fr;}
+  .tq{padding:24px 20px;}
+  .sp-copy p{max-width:100%;}
+}
+@media(prefers-reduced-motion:reduce){
+  .fu{transition:none;}
+  .fn1,.fn2{animation:none;}
+  .bdot{animation:none;}
+  .btile,.btile-bg,.btile-dim{transition:none;}
+  .step-panel{transition:none;}
+  .faq-a,.faq-ic{transition:none;}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── NAV ────────────────────────────────────────────── -->
+<nav id="nav" role="navigation" aria-label="Main">
+  <a href="#" class="logo" aria-label="HeartBridge home">
+    <!--
+      logo.png — 2× display size (116px height).
+      mix-blend-mode switches: screen on dark hero, multiply on white nav.
+    -->
+    <img src="logo.png" alt="HeartBridge" id="nav-logo"
+         style="height:88px;width:auto;object-fit:contain;mix-blend-mode:screen;opacity:.9;transition:all .35s;image-rendering:crisp-edges;">
+  </a>
+  <ul class="nav-links" aria-label="Site links">
+    <li><a href="#why">Why</a></li>
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#proof">Research</a></li>
+    <li><a href="#therapists-b2b">For Clinicians</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="btn btn-ghost-white" id="nav-login">Log In</a>
+    <a href="#" class="btn btn-blue">Start Free</a>
+  </div>
+</nav>
+
+<!-- ── ANNOUNCE ────────────────────────────────────────── -->
+<aside class="announce" role="note">
+  <span class="ann-pill">OFFER</span>
+  First cohort: 3 months full access free, including wearable &nbsp;·&nbsp; No credit card required
+</aside>
+
+<!-- ═══ HERO ═══════════════════════════════════════════════ -->
+<section class="hero" id="home" aria-label="Hero">
+  <div class="hero-inner">
+
+    <div class="hero-content fu">
+      <div class="hero-badge" aria-hidden="true"><div class="bdot"></div>Predictive Support for Neurodiverse Families</div>
+      <h1>Know today,<br>before it <em>begins.</em></h1>
+      <p class="hero-sub">HeartBridge turns overnight biometrics into a clear morning forecast — before the day starts.</p>
+      <div class="hero-ctas">
+        <a href="#" class="btn btn-blue btn-lg">Start Free — 3 Months Included</a>
+        <a href="#how" class="btn btn-ghost-white btn-lg">See How It Works →</a>
+      </div>
+      <div class="trust-line" aria-label="Key metrics">
+        <div class="tl-item"><div class="tl-num">Up to <em>90%</em></div><div class="tl-desc">forecast accuracy</div></div>
+        <div class="tl-item"><div class="tl-num"><em>95%</em></div><div class="tl-desc">clinician match rate</div></div>
+        <div class="tl-item"><div class="tl-num">2,000<em>+</em></div><div class="tl-desc">family interviews</div></div>
+      </div>
+    </div>
+
+    <div class="hero-visual" aria-hidden="true">
+      <div class="phone">
+        <div class="ps">
+          <div class="ps-hd"><span>HeartBridge</span><span>7:12 AM</span></div>
+          <div class="ps-name">Good morning, Maria</div>
+          <div class="ps-sub">Today's regulation forecast is ready</div>
+          <div class="m-row">
+            <div class="m"><span class="mv" style="color:#4CD964">88%</span><span class="ml">Sleep</span><span class="md dg">↑ Strong</span></div>
+            <div class="m"><span class="mv" style="color:#6B9FD4;font-size:.85rem">Low</span><span class="ml">Alert Risk</span><span class="md dg">↓ Calm</span></div>
+            <div class="m"><span class="mv" style="color:#F5A623">72</span><span class="ml">HRV</span><span class="md da">Resting</span></div>
+          </div>
+          <div class="i-box">
+            <div class="i-t">Today's Guidance</div>
+            <div class="i-tx">Sam is well-regulated — a great day for new activities.</div>
+            <div class="i-row"><span class="i-n">①</span>Outdoor activity this morning</div>
+            <div class="i-row"><span class="i-n">②</span>Introduce new task after lunch</div>
+          </div>
+          <div class="cl-mini">
+            <div class="cl-av">👩‍⚕️</div>
+            <div><div class="cl-n">Dr. Sarah Chen</div><div class="cl-c">BCBA · Penn GSE</div><div class="cl-s">Available · &lt;30 min</div></div>
+            <button class="cl-btn">Connect</button>
+          </div>
+        </div>
+        <div class="pnav" aria-hidden="true">
+          <div class="pni on">💬</div><div class="pni">👥</div>
+          <div class="pni on">📊</div><div class="pni">🩺</div><div class="pni">👤</div>
+        </div>
+      </div>
+      <div class="fn fn1"><div class="fn-ti">Dr. Sarah Chen, BCBA</div><div class="fn-tx">Available now · under 30 min</div></div>
+      <div class="fn fn2"><div class="fn-ti">Penn Medicine Partnership</div><div class="fn-tx">Clinical advisory &amp; research</div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ WHY — Oura portrait tile style ═════════════════════
+     No emojis. Tall portrait tiles. Gradient lifestyle BG.
+     Text overlay at bottom. Headline ≤6 words. Copy ≤16 words.
+     ═══════════════════════════════════════════════════════ -->
+<section class="sec why" id="why">
+  <div class="sec-inner">
+    <div class="sec-head fu">
+      <div class="sec-lbl">Why HeartBridge</div>
+      <h2>You deserve more<br>than <em>guesswork.</em></h2>
+      <p class="sub">Three barriers every neurodiverse family faces. HeartBridge dissolves all three.</p>
+    </div>
+
+    <div class="btile-grid">
+
+      <!-- Tile 01 — Certainty / Forecast -->
+      <div class="btile fu">
+        <img class="btile-bg" src="Children Sleep.jpg" alt="" aria-hidden="true">
+        <div class="btile-dim"></div>
+        <!-- Central product widget: readiness ring -->
+        <div class="btile-widget" aria-hidden="true">
+          <div class="bw-ring">
+            <div class="bw-ring-v">88</div>
+            <div class="bw-ring-l">Readiness</div>
+          </div>
+        </div>
+        <div class="btile-overlay">
+          <div class="btile-num">01 — Certainty</div>
+          <h3>Forecast, not <em>guesswork.</em></h3>
+          <p class="btile-p">A daily regulation score from overnight biometrics, before the day begins.</p>
+        </div>
+      </div>
+
+      <!-- Tile 02 — Access / Experts -->
+      <div class="btile fu">
+        <img class="btile-bg" src="Autism Clinian.jpg" alt="" aria-hidden="true">
+        <div class="btile-dim"></div>
+        <!-- Central product widget: clinician availability -->
+        <div class="btile-widget" aria-hidden="true">
+          <div class="bw-avail">
+            <div><span class="bw-avail-dot"></span><span class="bw-avail-s">Available now</span></div>
+            <div class="bw-avail-t">Your matched clinician</div>
+            <div class="bw-avail-n">Dr. S. Chen</div>
+            <div class="bw-avail-c">BCBA · Penn GSE · &lt;30 min</div>
+          </div>
+        </div>
+        <div class="btile-overlay">
+          <div class="btile-num">02 — Access</div>
+          <h3>Experts in <em>30 minutes.</em></h3>
+          <p class="btile-p">Licensed clinician matched to your child — no waitlist, no referral.</p>
+        </div>
+      </div>
+
+      <!-- Tile 03 — Affordability -->
+      <div class="btile fu">
+        <img class="btile-bg" src="parents smile.webp" alt="" aria-hidden="true">
+        <div class="btile-dim"></div>
+        <!-- Central product widget: cost comparison -->
+        <div class="btile-widget" aria-hidden="true">
+          <div class="bw-cost">
+            <div class="bw-cost-vs">
+              <div class="bw-cost-hi">Traditional: $30,000/yr</div>
+              <div class="bw-cost-lo-wrap">
+                <div class="bw-cost-lo">$29<sub>/mo</sub></div>
+              </div>
+              <div class="bw-cost-tag">97% less cost</div>
+            </div>
+          </div>
+        </div>
+        <div class="btile-overlay">
+          <div class="btile-num">03 — Affordability</div>
+          <h3>$29, not <em>$30,000.</em></h3>
+          <p class="btile-p">Full daily support at a fraction of traditional therapy cost.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS — tabbed stepper ══════════════════════ -->
+<section class="sec how" id="how">
+  <div class="sec-inner">
+    <div class="sec-head center fu">
+      <div class="sec-lbl">How It Works</div>
+      <h2>Four steps to a<br><em>better day.</em></h2>
+      <p class="sub">From overnight signals to a clear morning forecast — and live support when you need it.</p>
+    </div>
+
+    <div class="stepper" role="tablist" aria-label="How HeartBridge works">
+      <div class="step active" role="tab" aria-selected="true" aria-controls="panel-0" tabindex="0" data-idx="0">
+        <div class="step-circle">01</div>
+        <div class="step-lbl">Biometrics</div>
+        <div class="step-title">Capture overnight</div>
+      </div>
+      <div class="step" role="tab" aria-selected="false" aria-controls="panel-1" tabindex="-1" data-idx="1">
+        <div class="step-circle">02</div>
+        <div class="step-lbl">Analysis</div>
+        <div class="step-title">Morning forecast</div>
+      </div>
+      <div class="step" role="tab" aria-selected="false" aria-controls="panel-2" tabindex="-1" data-idx="2">
+        <div class="step-circle">03</div>
+        <div class="step-lbl">Guidance</div>
+        <div class="step-title">Real-time response</div>
+      </div>
+      <div class="step" role="tab" aria-selected="false" aria-controls="panel-3" tabindex="-1" data-idx="3">
+        <div class="step-circle">04</div>
+        <div class="step-lbl">Expert Connect</div>
+        <div class="step-title">Clinician in 30&nbsp;min</div>
+      </div>
+    </div>
+
+    <div class="step-panels">
+
+      <div class="step-panel active" id="panel-0" role="tabpanel">
+        <div class="sp-copy">
+          <div class="sp-step">Step 01 — Capture</div>
+          <h3>Sleep while the<br><em>data works.</em></h3>
+          <p>A lightweight wearable gathers sleep quality, HRV, and physiological stress signals overnight — no manual logging, no disruption.</p>
+        </div>
+        <div class="sp-visual">
+          <div class="dv-lbl">Overnight Capture · Last Night</div>
+          <div class="dv-row">
+            <div class="dvc"><span class="dvc-v" style="color:#4CD964">88%</span><span class="dvc-l">Sleep Quality</span></div>
+            <div class="dvc"><span class="dvc-v" style="color:#6B9FD4">72</span><span class="dvc-l">HRV Score</span></div>
+            <div class="dvc"><span class="dvc-v" style="color:#F5A623">Low</span><span class="dvc-l">Stress Signal</span></div>
+          </div>
+          <div class="dv-box"><div class="dv-box-t">Summary</div><div class="dv-box-tx">Restful sleep, low arousal. Well-regulated start predicted.</div></div>
+        </div>
+      </div>
+
+      <div class="step-panel" id="panel-1" role="tabpanel">
+        <div class="sp-copy">
+          <div class="sp-step">Step 02 — Forecast</div>
+          <h3>Wake up to a<br><em>clear forecast.</em></h3>
+          <p>AI translates overnight data into a plain-language regulation forecast and personalized action plan — ready every morning.</p>
+        </div>
+        <div class="sp-visual">
+          <div class="dv-lbl">Today's Forecast · Sam</div>
+          <div class="dv-row">
+            <div class="dvc"><span class="dvc-v" style="color:#4CD964">Low</span><span class="dvc-l">Alert Risk</span></div>
+            <div class="dvc"><span class="dvc-v" style="color:#4CD964">High</span><span class="dvc-l">Focus</span></div>
+            <div class="dvc"><span class="dvc-v" style="color:#6B9FD4">Good</span><span class="dvc-l">Regulation</span></div>
+          </div>
+          <div class="dv-box">
+            <div class="dv-box-t">Action Plan</div>
+            <div class="dv-box-tx">Well-regulated today. Great for new experiences and social interaction.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-panel" id="panel-2" role="tabpanel">
+        <div class="sp-copy">
+          <div class="sp-step">Step 03 — Guidance</div>
+          <h3>Something happened —<br><em>what do I do?</em></h3>
+          <p>Log any real-time behavioral event. AI cross-references today's physiological context and delivers a tailored response strategy instantly.</p>
+        </div>
+        <div class="sp-visual">
+          <div class="dv-lbl">Live Guidance · Now</div>
+          <div class="dv-box" style="margin-bottom:8px">
+            <div class="dv-box-t">Context</div>
+            <div class="dv-box-tx">Transition resistance at 3 PM aligns with predicted afternoon alertness dip.</div>
+          </div>
+          <div class="dv-box" style="background:rgba(43,184,184,.08);border-color:rgba(43,184,184,.14)">
+            <div class="dv-box-t" style="color:var(--teal2)">Suggested Response</div>
+            <div class="dv-box-tx">Offer a 5-minute sensory break before the next transition.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-panel" id="panel-3" role="tabpanel">
+        <div class="sp-copy">
+          <div class="sp-step">Step 04 — Connect</div>
+          <h3>I need help —<br><em>right now.</em></h3>
+          <p>Connect to a matched, licensed BCBA in under 30 minutes. Your child's behavioral data speaks first — no lengthy intake required.</p>
+        </div>
+        <div class="sp-visual">
+          <div class="dv-lbl">Your Matched Clinicians</div>
+          <div class="dv-row2">
+            <div class="dv-pill">
+              <div class="dv-av">👩‍⚕️</div>
+              <div><div class="dv-pn">Dr. Sarah Chen</div><div class="dv-pc">BCBA · Penn GSE</div><div class="dv-ps">Available · &lt;30 min</div></div>
+              <button class="dv-pbtn">Connect</button>
+            </div>
+            <div class="dv-pill">
+              <div class="dv-av">👨‍⚕️</div>
+              <div><div class="dv-pn">Dr. Michael Torres</div><div class="dv-pc">ABA Specialist</div><div class="dv-ps">Available today</div></div>
+              <button class="dv-pbtn">Book</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── WEARABLE ─────────────────────────────────────────── -->
+<section class="sec wearable" id="wearable">
+  <div class="sec-inner">
+    <div class="wgrid">
+      <div class="wdev fu" aria-hidden="true">
+        <span class="wdev-em">⌚</span>
+        <div class="wdev-n">HeartBridge Wearable</div>
+        <div class="wdev-s">Designed for children ages 2–8</div>
+        <div class="wdev-specs">
+          <div class="ws"><div class="ws-i">💤</div><div class="ws-t">Sleep Quality</div></div>
+          <div class="ws"><div class="ws-i">❤️</div><div class="ws-t">HRV</div></div>
+          <div class="ws"><div class="ws-i">⚡</div><div class="ws-t">Stress Signals</div></div>
+          <div class="ws"><div class="ws-i">🔋</div><div class="ws-t">7-Day Battery</div></div>
+          <div class="ws"><div class="ws-i">💧</div><div class="ws-t">Water Resistant</div></div>
+          <div class="ws"><div class="ws-i">📶</div><div class="ws-t">Auto Sync</div></div>
+        </div>
+      </div>
+      <div class="winfo fu">
+        <div class="sec-lbl">The HeartBridge Wearable</div>
+        <h3>Passive capture,<br><em>active forecast.</em></h3>
+        <p>No buttons, no interaction. The wearable sits comfortably overnight — and every morning a clear forecast and action plan are waiting.</p>
+        <ul class="wfeats" aria-label="Wearable features">
+          <li class="wf"><div class="wf-ck" aria-hidden="true">✓</div><div class="wf-t"><strong>Daily regulation forecasts</strong> — a plain-language prediction before you need it</div></li>
+          <li class="wf"><div class="wf-ck" aria-hidden="true">✓</div><div class="wf-t"><strong>Adaptive AI</strong> — learns your child's unique patterns over time</div></li>
+          <li class="wf"><div class="wf-ck" aria-hidden="true">✓</div><div class="wf-t"><strong>Shareable data</strong> — one tap to share with your clinician, no manual reporting</div></li>
+        </ul>
+        <div class="pricebox">
+          <div>
+            <div class="pricebox-amt">$29<sub>/mo</sub></div>
+            <div class="pricebox-desc">Wearable + full platform · First 3 months free · Cancel anytime</div>
+          </div>
+          <a href="#pricing" class="btn btn-teal btn-lg">Get Started Free</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRICING ─────────────────────────────────────────── -->
+<section class="sec pricing" id="pricing">
+  <div class="sec-inner">
+    <div class="sec-head center fu">
+      <div class="sec-lbl">Pricing</div>
+      <h2>Quality support,<br><em>fraction of the cost.</em></h2>
+      <div class="sbar" style="display:inline-flex;margin-bottom:0">
+        <span class="sbar-x">Traditional therapy: $30,000/yr</span>
+        <span style="color:var(--muted);font-size:.74rem">vs</span>
+        <span class="sbar-n">HeartBridge Core: $348/yr</span>
+      </div>
+    </div>
+    <div class="plan-grid">
+
+      <div class="plan fu">
+        <div class="pname">Free</div>
+        <div class="pprice">$0<sub>/mo</sub></div>
+        <div class="pdesc">Start with no commitment</div>
+        <ul class="pfeats">
+          <li class="pf"><span class="py">✓</span>AI behavioral guidance</li>
+          <li class="pf"><span class="py">✓</span>Real-time behavioral logging</li>
+          <li class="pf"><span class="py">✓</span>Verified clinician directory</li>
+          <li class="pf"><span class="py">✓</span>Parent community access</li>
+          <li class="pf"><span class="px">✗</span><span style="color:var(--muted)">Daily regulation forecasts</span></li>
+          <li class="pf"><span class="px">✗</span><span style="color:var(--muted)">Wearable biometric capture</span></li>
+        </ul>
+        <a href="#" class="btn btn-ghost" style="width:100%;justify-content:center">Start Free</a>
+      </div>
+
+      <div class="plan feat fu">
+        <div class="pbadge">✦ Most Popular</div>
+        <div class="pname">Core</div>
+        <div class="pprice">$29<sub>/mo</sub></div>
+        <div class="pdesc">Full wearable + AI forecasting</div>
+        <ul class="pfeats">
+          <li class="pf"><span class="py">✓</span>Wearable biometric capture</li>
+          <li class="pf"><span class="py">✓</span>Daily regulation forecasts</li>
+          <li class="pf"><span class="py">✓</span>Adaptive AI personalization</li>
+          <li class="pf"><span class="py">✓</span>Clinician matching + connect</li>
+          <li class="pf"><span class="py">✓</span>Weekly expert sessions</li>
+          <li class="pf"><span class="py">✓</span>Full behavioral data history</li>
+        </ul>
+        <a href="#" class="btn btn-blue" style="width:100%;justify-content:center">Start Free — 3 Months Included</a>
+      </div>
+
+      <div class="plan fu">
+        <div class="pname">Plus</div>
+        <div class="pprice">$49<sub>/mo</sub></div>
+        <div class="pdesc">Priority access + deeper insights</div>
+        <ul class="pfeats">
+          <li class="pf"><span class="py">✓</span>Everything in Core</li>
+          <li class="pf"><span class="py">✓</span>Priority clinician response</li>
+          <li class="pf"><span class="py">✓</span>Peer cohort benchmarking</li>
+          <li class="pf"><span class="py">✓</span>Unlimited AI video analysis</li>
+          <li class="pf"><span class="py">✓</span>Dedicated account support</li>
+          <li class="pf"><span class="py">✓</span>Early access to new features</li>
+        </ul>
+        <a href="#" class="btn btn-navy" style="width:100%;justify-content:center">Upgrade to Plus</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PROOF ═══════════════════════════════════════════════ -->
+<section class="sec proof" id="proof">
+  <div class="sec-inner">
+
+    <div class="sec-head fu">
+      <div class="sec-lbl lt">Evidence &amp; Trust</div>
+      <h2 class="wh">Backed by science,<br>built by <em>the right people.</em></h2>
+    </div>
+
+    <div class="stats-row fu" aria-label="Key statistics">
+      <div class="si">
+        <div class="si-num">Up to <em>90%</em></div>
+        <div class="si-desc">forecast accuracy — multimodal behavioral AI</div>
+      </div>
+      <div class="si">
+        <div class="si-num"><em>95%</em></div>
+        <div class="si-desc">clinician matching success — 60 participants</div>
+      </div>
+      <div class="si">
+        <div class="si-num">2,000<em>+</em></div>
+        <div class="si-desc">parent interviews to shape the product</div>
+      </div>
+      <div class="si">
+        <div class="si-num">3<em>×</em></div>
+        <div class="si-desc">parent communities of 1,000 each with embedded advisors</div>
+      </div>
+    </div>
+
+    <div class="logo-wall fu" aria-label="Institutional partners">
+      <div class="lw-lbl">Institutional Partners &amp; Advisors</div>
+      <!-- Marquee: two copies of the same logos for a seamless loop -->
+      <div class="lw-track" aria-hidden="true">
+        <div class="lp">Penn Medicine</div>
+        <div class="lp">Penn GSE</div>
+        <div class="lp">Penn Med Psychology &amp; Autism Research</div>
+        <div class="lp">Accredited Medical Schools</div>
+        <div class="lp">Penn Medicine</div>
+        <div class="lp">Penn GSE</div>
+        <div class="lp">Penn Med Psychology &amp; Autism Research</div>
+        <div class="lp">Accredited Medical Schools</div>
+      </div>
+    </div>
+
+    <div class="ev-grid fu" aria-label="Evidence">
+      <div class="ev">
+        <div class="ev-stat">Up to <em>90%</em></div>
+        <div class="ev-desc">forecast accuracy in behavioral analysis, validated through multimodal AI/ML testing. <a href="#faq" style="color:rgba(107,159,212,.6);font-size:.72rem">Learn more →</a></div>
+      </div>
+      <div class="ev">
+        <div class="ev-stat"><em>95%</em></div>
+        <div class="ev-desc">parent–therapist matching success, blind-tested across 60 participants in our pilot study. <a href="#faq" style="color:rgba(107,159,212,.6);font-size:.72rem">Learn more →</a></div>
+      </div>
+      <div class="ev">
+        <div class="ev-stat">2,000<em>+</em></div>
+        <div class="ev-desc">parent and caregiver interviews conducted to validate HeartBridge's design and clinical approach. <a href="#faq" style="color:rgba(107,159,212,.6);font-size:.72rem">Learn more →</a></div>
+      </div>
+    </div>
+
+    <!--
+      TESTIMONIALS — expanded 2–3 sentences each.
+      No avatars. No real names. Text-only card + role label.
+    -->
+    <div class="test-grid fu" aria-label="User testimonials">
+
+      <div class="tq">
+        <div class="tq-stars" aria-label="5 stars">★★★★★</div>
+        <blockquote class="tq-text">Before HeartBridge, every morning felt like a gamble — I never knew if we'd have a hard day until it was already happening. Now I wake up with a forecast and a plan. Our mornings are genuinely calmer, and I feel like I finally have something concrete to share with our support team.</blockquote>
+        <div class="tq-cred">Parent of a 6-year-old · ASD level 1 · Early access member</div>
+      </div>
+
+      <div class="tq">
+        <div class="tq-stars" aria-label="5 stars">★★★★★</div>
+        <blockquote class="tq-text">I logged a difficult transition moment and had a tailored response strategy within seconds. Then I connected with a licensed BCBA in under 25 minutes — with my child's full behavioral context already shared. That speed, with that level of preparation, changed how I approach every challenging moment.</blockquote>
+        <div class="tq-cred">Caregiver · Parent of a 4-year-old · Early access member</div>
+      </div>
+
+    </div>
+
+    <div class="disclaimer fu" role="note">
+      <p>HeartBridge is a behavioral support tool — not a diagnostic instrument. It does not diagnose, treat, or cure any condition. Forecasts are based on physiological signals; individual results will vary. Always work with licensed professionals for clinical decisions. <a href="#faq" style="color:rgba(107,159,212,.5)">See FAQ →</a></p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── FOR CLINICIANS ──────────────────────────────────── -->
+<section class="sec b2b" id="therapists-b2b">
+  <div class="sec-inner">
+    <div class="b2b-inner">
+      <div>
+        <div class="sec-lbl lt">For Clinicians</div>
+        <h2 class="wh">Are you a BCBA<br>or <em>school clinician?</em></h2>
+        <p class="sub wh" style="margin-bottom:0">Live behavioral data before every session, and patients matched to your expertise — on your schedule.</p>
+        <ul class="b2b-list" aria-label="Benefits for clinicians">
+          <li class="b2b-li"><span class="b2b-ic">—</span>Live regulation forecasts before every session — no lengthy intake</li>
+          <li class="b2b-li"><span class="b2b-ic">—</span>Flexible scheduling, supplemental income, zero admin overhead</li>
+          <li class="b2b-li"><span class="b2b-ic">—</span>AI-assisted response suggestions grounded in each child's physiological history</li>
+          <li class="b2b-li"><span class="b2b-ic">—</span>Platform handles all billing — transparent commission structure</li>
+        </ul>
+        <a href="#" class="btn btn-teal btn-lg" style="margin-top:28px;display:inline-flex">Join as a Clinician →</a>
+      </div>
+      <div class="b2b-card">
+        <div class="b2b-card-t">Clinician Plans</div>
+        <div class="b2b-plan">
+          <div class="b2b-ph"><div class="b2b-pn">Individual Practitioner</div><div class="b2b-pp">$79/mo</div></div>
+          <div class="b2b-pd">Independent clinicians · AI tools · Smart matching · Flexible hours</div>
+        </div>
+        <div class="b2b-plan">
+          <div class="b2b-ph"><div class="b2b-pn">Clinic or School Bundle</div><div class="b2b-pp">$69/seat/mo</div></div>
+          <div class="b2b-pd">10+ seats · Volume discount · Unified dashboard · Pilot school partnerships</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ══════════════════════════════════════════════════ -->
+<section class="sec faq" id="faq">
+  <div class="sec-inner">
+    <div class="sec-head center fu">
+      <div class="sec-lbl">FAQ</div>
+      <h2>Questions,<br><em>answered honestly.</em></h2>
+      <p class="sub">Including what HeartBridge is not.</p>
+    </div>
+    <div class="faq-list">
+
+      <div class="faq-item fu">
+        <button class="faq-q" aria-expanded="false"><span class="faq-qt">Who is HeartBridge designed for?</span><span class="faq-ic" aria-hidden="true">+</span></button>
+        <div class="faq-a" role="region"><div class="faq-a-in">Parents and caregivers of neurodiverse children ages 2–8 seeking proactive, daily behavioral support — especially families navigating long waitlists or fragmented care. Also built for licensed clinicians (BCBA, ABA) seeking data-informed tools and flexible practice options.</div></div>
+      </div>
+
+      <div class="faq-item fu">
+        <button class="faq-q" aria-expanded="false"><span class="faq-qt">Does HeartBridge replace my child's therapist?</span><span class="faq-ic" aria-hidden="true">+</span></button>
+        <div class="faq-a" role="region"><div class="faq-a-in">No — and this is important. HeartBridge complements your existing care team. All clinical decisions, diagnoses, and treatment plans remain with your licensed professionals. HeartBridge helps you arrive at appointments with better data and clearer questions.</div></div>
+      </div>
+
+      <div class="faq-item fu">
+        <button class="faq-q" aria-expanded="false"><span class="faq-qt">What does the daily forecast actually mean?</span><span class="faq-ic" aria-hidden="true">+</span></button>
+        <div class="faq-a" role="region"><div class="faq-a-in">Think of it like a weather forecast — not a guarantee, but a well-informed prediction. AI translates overnight physiological signals into a plain-language regulation outlook and action plan. Individual results will vary.</div></div>
+      </div>
+
+      <div class="faq-item fu">
+        <button class="faq-q" aria-expanded="false"><span class="faq-qt">Do I need the wearable to use HeartBridge?</span><span class="faq-ic" aria-hidden="true">+</span></button>
+        <div class="faq-a" role="region"><div class="faq-a-in">No. The app is free without a wearable — you get AI guidance, real-time logging, the clinician directory, and the parent community. The wearable unlocks daily forecasting and adaptive AI predictions. It's included free for your first 3 months.</div></div>
+      </div>
+
+      <div class="faq-item fu">
+        <button class="faq-q" aria-expanded="false"><span class="faq-qt">How is my child's data protected?</span><span class="faq-ic" aria-hidden="true">+</span></button>
+        <div class="faq-a" role="region"><div class="faq-a-in">All data is encrypted in transit and at rest, stored in HIPAA-compliant infrastructure. We never sell or share your child's data. Clinician data sharing is always opt-in — never automatic.</div></div>
+      </div>
+
+      <div class="faq-item fu">
+        <button class="faq-q" aria-expanded="false"><span class="faq-qt">Can I cancel anytime? What's included in the free trial?</span><span class="faq-ic" aria-hidden="true">+</span></button>
+        <div class="faq-a" role="region"><div class="faq-a-in">Yes — no contracts, no cancellation fees. Your first 3 months include full Core access, including the wearable, with no credit card required. After 3 months, continue on a paid plan or downgrade to free. Your data stays accessible for 90 days after any cancellation.</div></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── FINAL CTA ──────────────────────────────── -->
+<section class="final-cta">
+  <h2>Anticipate. Respond.<br><em>Feel prepared.</em></h2>
+  <p>Start free — no credit card. First cohort gets 3 months full access, including the wearable.</p>
+  <div class="final-btns">
+    <a href="#" class="btn btn-white btn-lg">Start Free — 3 Months Included</a>
+    <a href="#pricing" class="btn btn-outline-white btn-lg">View Pricing →</a>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────── -->
+<footer>
+  <div class="sec-inner">
+    <div class="ftgrid">
+      <div>
+        <div class="ftbrand">
+          <img src="logo.png" alt="HeartBridge" style="height:34px;width:auto;object-fit:contain;mix-blend-mode:screen;opacity:.7;image-rendering:crisp-edges;">
+        </div>
+        <p class="ft-desc">AI-powered behavioral intelligence for neurodiverse learners and their families.</p>
+        <div class="ftinst">
+          <div class="ftinst-l">Research Partners &amp; Advisors</div>
+          <div class="ftinst-v">Penn Medicine · Penn GSE · Penn Med Psychology · UC Berkeley · UPenn</div>
+        </div>
+      </div>
+      <div>
+        <div class="ftcol-t">Product</div>
+        <ul class="ftlinks">
+          <li><a href="#how">How It Works</a></li>
+          <li><a href="#wearable">Wearable</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#proof">Research</a></li>
+          <li><a href="#therapists-b2b">For Clinicians</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ftcol-t">Support</div>
+        <ul class="ftlinks">
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#">Parent Community</a></li>
+          <li><a href="#">Weekly Sessions</a></li>
+          <li><a href="mailto:heartbridge1011@gmail.com">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="ftcol-t">Company</div>
+        <ul class="ftlinks">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Team</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Careers</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="ftbot">
+      <div>© 2026 HeartBridge · A support tool, not a diagnostic service · Results vary · Always consult a licensed professional.</div>
+      <div class="ftleg">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">HIPAA</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Nav: transparent on hero → solid white on scroll ──────
+const navEl   = document.getElementById('nav');
+const logoEl  = document.getElementById('nav-logo');
+const loginEl = document.getElementById('nav-login');
+
+function updateNav() {
+  const scrolled = window.scrollY > 50;
+  navEl.classList.toggle('scrolled', scrolled);
+  // On dark hero: screen blend makes white logo pop on navy bg
+  // On white nav:  multiply blend removes logo's white background
+  logoEl.style.mixBlendMode = scrolled ? 'multiply' : 'screen';
+  logoEl.style.opacity      = scrolled ? '1' : '0.9';
+  loginEl.className         = scrolled ? 'btn btn-ghost' : 'btn btn-ghost-white';
+}
+window.addEventListener('scroll', updateNav, { passive: true });
+updateNav();
+
+// ── Scroll reveal ──────────────────────────────────────────
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('in'), i * 70);
+      revObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.07 });
+document.querySelectorAll('.fu').forEach(el => revObs.observe(el));
+
+// ── Interactive tabbed stepper ─────────────────────────────
+const steps  = document.querySelectorAll('.step');
+const panels = document.querySelectorAll('.step-panel');
+
+function activateStep(idx) {
+  steps.forEach((s, i) => {
+    const on = i === idx;
+    s.classList.toggle('active', on);
+    s.setAttribute('aria-selected', on);
+    s.tabIndex = on ? 0 : -1;
+  });
+  panels.forEach((p, i) => p.classList.toggle('active', i === idx));
+}
+
+steps.forEach(s => {
+  s.addEventListener('click', () => activateStep(+s.dataset.idx));
+  s.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activateStep(+s.dataset.idx); }
+    if (e.key === 'ArrowRight') activateStep(Math.min(+s.dataset.idx + 1, 3));
+    if (e.key === 'ArrowLeft')  activateStep(Math.max(+s.dataset.idx - 1, 0));
+  });
+});
+
+// ── FAQ accordion (one open at a time) ────────────────────
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item   = q.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => {
+      i.classList.remove('open');
+      i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      q.setAttribute('aria-expanded', 'true');
+    }
+  });
+  q.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      q.closest('.faq-item').classList.remove('open');
+      q.setAttribute('aria-expanded', 'false');
+      q.focus();
+    }
+  });
+});
+
+// ── Smooth scroll ──────────────────────────────────────────
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const id = a.getAttribute('href');
+    if (id === '#') return;
+    const target = document.querySelector(id);
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+</script>
+</body>
+</html>
